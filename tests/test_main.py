@@ -1,44 +1,19 @@
+import io
+import time
+from datetime import datetime
+
+import pandas as pd
 import pytest
+from fastapi import status
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlmodel import Session, SQLModel, create_engine, func, select
+
+from endpoints.sales import sale_router
 # from app.database import Base  # Replace app with your app's name
 from main import app
-
-from fastapi.testclient import TestClient
-from settings import SessionDep
-import io
-import pandas as pd
-from fastapi.testclient import TestClient
-from fastapi import status
-from datetime import datetime
 from models import Sale
-from sqlmodel import Session, SQLModel, create_engine, select, func
-from sqlalchemy import text
-from main import app
-from endpoints.sales import sale_router
 from settings import SessionDep, get_session
-
-
-
-
-# Create test database engine and session
-# test_engine = create_engine("sqlite:///./test.db")  # Using SQLite for testing
-# SQLModel.metadata.create_all(test_engine)
-# test_session = Session(test_engine)
-
-# # Override the session dependency
-# def override_get_session():
-#     try:
-#         yield test_session
-#     finally:
-#         test_session.rollback()
-
-# # Override the dependency
-# app.dependency_overrides[SessionDep] = override_get_session
-
-# # Create test client
-# client = TestClient(app)
-import time
 
 # Seconds since epoch
 unix_timestamp = str(int(time.time())) 
@@ -138,8 +113,8 @@ def test_import_sales(client, test_session):
     assert imported_sales[1].date == datetime.strptime("05/12/2024", "%m/%d/%Y").date()
     
 from datetime import date, timedelta
-    
-    
+
+
 def test_metrics_revenue(client, test_session):
     """Test revenue metrics endpoint with 5 seeded sales."""
     # Create 5 test sales
@@ -258,12 +233,3 @@ def test_health_check(client):
     assert data["status"] == "ok"
     assert data["database"] == "reachable"    
     
-    
-import os
-
-
-try:
-    os.remove(file_path)
-    print(f"Successfully deleted {file_path}")
-except FileNotFoundError:
-    print(f"File not found: {file_path}")
