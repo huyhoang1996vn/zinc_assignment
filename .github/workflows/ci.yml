@@ -8,21 +8,21 @@ on:
 jobs:
   build_and_test:
     runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_ROOT_PASSWORD }}
-          MYSQL_DATABASE: ${{ secrets.DB_NAME }}
-        ports:
-          # The MySQL service's port 3306 will be mapped to a port on the runner host.
-          # We can then connect to it using 127.0.0.1:3306 from steps running on the host.
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h localhost -p${{ secrets.DB_ROOT_PASSWORD }}"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
+    # services:
+    #   mysql:
+    #     image: mysql:8.0
+    #     env:
+    #       MYSQL_ROOT_PASSWORD: ${{ secrets.DB_ROOT_PASSWORD }}
+    #       MYSQL_DATABASE: ${{ secrets.DB_NAME }}
+    #     ports:
+    #       # The MySQL service's port 3306 will be mapped to a port on the runner host.
+    #       # We can then connect to it using 127.0.0.1:3306 from steps running on the host.
+    #       - 3306:3306
+    #     options: >-
+    #       --health-cmd="mysqladmin ping -h localhost -p${{ secrets.DB_ROOT_PASSWORD }}"
+    #       --health-interval=10s
+    #       --health-timeout=5s
+    #       --health-retries=5
 
     steps:
       - name: Checkout code
@@ -43,7 +43,7 @@ jobs:
         env:
           # These environment variables will be available to the container running migrations
           # Assumes your main.py/settings.py can pick these up for Alembic
-          SQL_URL: mysql+pymysql://root:${{ secrets.DB_ROOT_PASSWORD }}@{{ secrets.DB_HOST }}:{{ secrets.DB_PORT }}
+          SQL_URL: mysql+pymysql://root:${{ secrets.DB_ROOT_PASSWORD }}@${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}
           DB_NAME: ${{ secrets.DB_NAME }}
         run: |
           echo "Waiting for MySQL to be healthy..."
@@ -61,7 +61,7 @@ jobs:
 
       - name: Run unit tests
         env:
-          SQL_URL: mysql+pymysql://root:${{ secrets.DB_ROOT_PASSWORD }}@{{ secrets.DB_HOST }}:{{ secrets.DB_PORT }}
+          SQL_URL: mysql+pymysql://root:${{ secrets.DB_ROOT_PASSWORD }}@${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}
           DB_NAME: ${{ secrets.DB_NAME }}
         run: |
           docker run \
