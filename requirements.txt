@@ -13,3 +13,4 @@ loguru
 mysqlclient
 pandas
 python-multipart
+cryptography

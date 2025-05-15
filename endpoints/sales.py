@@ -5,6 +5,7 @@ from fastapi import APIRouter, Query, UploadFile, status
 from fastapi.responses import JSONResponse
 from loguru import logger
 from sqlalchemy.sql import text
+from sqlmodel import func, select
 from endpoints.base_models import *
 from models import *
 from settings import SessionDep
@@ -46,7 +47,7 @@ async def import_sales(
         sale_data = df.to_dict(orient="records")
         session.bulk_insert_mappings(Sale, sale_data)
         session.commit()
-        result = session.query(Sale).count()
+        result = session.exec(select(func.count()).select_from(Sale)).one()
         return JSONResponse(
             content={"imported_rows": result}, status_code=status.HTTP_201_CREATED
         )
